@@ -11,7 +11,7 @@ Application Windows en C# pour aider dans les chasses au trésor sur Dofus. Elle
 
 ## Prérequis
 - Visual Studio
-- .NET Framework
+- .NET 8
 - Arduino compatible
 
 ## Installation
