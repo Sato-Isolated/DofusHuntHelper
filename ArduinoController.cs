@@ -1,182 +1,268 @@
 ﻿using System.IO.Ports;
 
-namespace DofusHuntHelper
+namespace DofusHuntHelper;
+
+public class ArduinoController
 {
-    public class ArduinoController
+    private readonly string _logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ArduinoController.log");
+    private readonly List<string> _commandLog;
+    private bool _isConnected;
+    private readonly SerialPort _serialPort;
+
+    public ArduinoController(string portName, int baudRate = 9600)
     {
-        private SerialPort _serialPort;
-        private bool _isConnected;
-        private List<string> _commandLog;
-
-        public event Action<string>? DataReceived;
-        public event Action? Connected;
-        public event Action? Disconnected;
-        public event Action<string>? ErrorOccurred;
-
-        public ArduinoController(string portName, int baudRate = 9600)
+        _serialPort = new SerialPort(portName, baudRate)
         {
-            _serialPort = new SerialPort(portName, baudRate)
+            DtrEnable = true,
+            RtsEnable = true
+        };
+        _commandLog = new List<string>();
+        InitializeLogFile();
+    }
+
+    public event Action<string>? DataReceived;
+    public event Action? Connected;
+    public event Action? Disconnected;
+    public event Action<string>? ErrorOccurred;
+
+    private void InitializeLogFile()
+    {
+        try
+        {
+            if (!File.Exists(_logFilePath)) File.Create(_logFilePath).Dispose();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Erreur lors de la création du fichier de log : " + ex.Message);
+        }
+    }
+
+    public bool Connect()
+    {
+        try
+        {
+            if (!_serialPort.IsOpen)
             {
-                DtrEnable = true,  // Permet à certains modèles Arduino (comme le R4) de bien se réinitialiser
-                RtsEnable = true
-            };
-            _commandLog = new List<string>();
+                _serialPort.Open();
+                _isConnected = true;
+                LogMessage("Arduino connecté.");
+                Connected?.Invoke();
+                return true;
+            }
+
+            HandleError("Le port série est déjà ouvert.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            HandleError(
+                "Accès non autorisé au port série. Assurez-vous qu'aucune autre application n'utilise le port.");
+        }
+        catch (IOException ex)
+        {
+            HandleError("Erreur d'entrée/sortie : " + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            HandleError("Erreur inconnue lors de la connexion à l'Arduino : " + ex.Message);
         }
 
-        public bool Connect()
-        {
-            try
-            {
-                if (!_serialPort.IsOpen)
-                {
-                    _serialPort.Open();
-                    _isConnected = true;
-                    Console.WriteLine("Arduino connecté.");
-                    Connected?.Invoke();
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                HandleError("Erreur lors de la connexion à l'Arduino : " + ex.Message);
-            }
-            return false;
-        }
+        return false;
+    }
 
-        public void Disconnect()
+    public void Disconnect()
+    {
+        try
         {
             if (_serialPort.IsOpen)
             {
                 _serialPort.Close();
                 _isConnected = false;
-                Console.WriteLine("Arduino déconnecté.");
+                LogMessage("Arduino déconnecté.");
                 Disconnected?.Invoke();
-            }
-        }
-
-        public async Task SendSignalAsync(string signal)
-        {
-            if (_isConnected && _serialPort.IsOpen)
-            {
-                try
-                {
-                    _serialPort.Write(signal);
-                    Console.WriteLine($"Signal envoyé : {signal}");
-                    _commandLog.Add(signal);
-                    await Task.Delay(100);
-                }
-                catch (Exception ex)
-                {
-                    HandleError("Erreur lors de l'envoi du signal : " + ex.Message);
-                }
             }
             else
             {
-                HandleError("Arduino non connecté.");
+                HandleError("Le port série est déjà fermé.");
             }
         }
-
-        public async Task SendCommandAsync(string command, int delayMs = 100)
+        catch (Exception ex)
         {
-            if (_isConnected && _serialPort.IsOpen)
-            {
-                try
-                {
-                    _serialPort.WriteLine(command);
-                    Console.WriteLine($"Commande envoyée : {command}");
-                    _commandLog.Add(command);
-                    await Task.Delay(delayMs);
-                }
-                catch (Exception ex)
-                {
-                    HandleError("Erreur lors de l'envoi de la commande : " + ex.Message);
-                }
-            }
+            HandleError("Erreur lors de la déconnexion : " + ex.Message);
         }
+    }
 
-        public void StartListening()
+    public async Task SendSignalAsync(string signal)
+    {
+        if (_isConnected && _serialPort.IsOpen)
+            try
+            {
+                _serialPort.Write(signal);
+                LogMessage($"Signal envoyé : {signal}");
+                _commandLog.Add(signal);
+                await Task.Delay(100);
+            }
+            catch (InvalidOperationException)
+            {
+                HandleError("Le port série n'est pas ouvert.");
+            }
+            catch (TimeoutException)
+            {
+                HandleError("Délai d'attente dépassé lors de l'envoi du signal.");
+            }
+            catch (Exception ex)
+            {
+                HandleError("Erreur inattendue lors de l'envoi du signal : " + ex.Message);
+            }
+        else
+            HandleError("Arduino non connecté.");
+    }
+
+    public async Task SendCommandAsync(string command, int delayMs = 100)
+    {
+        if (_isConnected && _serialPort.IsOpen)
+            try
+            {
+                _serialPort.WriteLine(command);
+                LogMessage($"Commande envoyée : {command}");
+                _commandLog.Add(command);
+                await Task.Delay(delayMs);
+            }
+            catch (InvalidOperationException)
+            {
+                HandleError("Le port série n'est pas ouvert.");
+            }
+            catch (TimeoutException)
+            {
+                HandleError("Délai d'attente dépassé lors de l'envoi de la commande.");
+            }
+            catch (Exception ex)
+            {
+                HandleError("Erreur inattendue lors de l'envoi de la commande : " + ex.Message);
+            }
+        else
+            HandleError("Arduino non connecté.");
+    }
+
+    public void StartListening()
+    {
+        try
         {
             if (_serialPort.IsOpen)
             {
                 _serialPort.DataReceived += SerialPort_DataReceived;
-                Console.WriteLine("Écoute des signaux de l'Arduino...");
+                LogMessage("Écoute des signaux de l'Arduino...");
+            }
+            else
+            {
+                HandleError("Le port série n'est pas ouvert.");
             }
         }
-
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        catch (Exception ex)
         {
-            string data = _serialPort.ReadExisting();
-            Console.WriteLine($"Signal reçu : {data}");
+            HandleError("Erreur lors du démarrage de l'écoute : " + ex.Message);
+        }
+    }
+
+    private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+    {
+        try
+        {
+            var data = _serialPort.ReadExisting();
+            LogMessage($"Signal reçu : {data}");
             DataReceived?.Invoke(data);
         }
-
-        public void SendPulse(string signal, int durationMs)
+        catch (Exception ex)
         {
-            Task.Run(async () =>
-            {
-                await SendSignalAsync(signal);
-                await Task.Delay(durationMs);
-                await SendSignalAsync("0"); // Envoyer un signal pour arrêter
-            });
+            HandleError("Erreur lors de la réception des données : " + ex.Message);
+        }
+    }
+
+    public void SendPulse(string signal, int durationMs)
+    {
+        Task.Run(async () =>
+        {
+            await SendSignalAsync(signal);
+            await Task.Delay(durationMs);
+            await SendSignalAsync("0");
+        });
+    }
+
+    public async Task<bool> WaitForResponseAsync(string expectedResponse, int timeoutMs)
+    {
+        var tcs = new TaskCompletionSource<bool>();
+
+        void Handler(string data)
+        {
+            if (data.Contains(expectedResponse)) tcs.TrySetResult(true);
         }
 
-        public async Task<bool> WaitForResponseAsync(string expectedResponse, int timeoutMs)
+        DataReceived += Handler;
+
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(timeoutMs));
+
+        DataReceived -= Handler;
+
+        if (completedTask == tcs.Task) return true;
+
+        HandleError("Temps d'attente dépassé pour la réponse attendue.");
+        return false;
+    }
+
+    public void LogCommandsToFile(string filePath)
+    {
+        try
         {
-            var tcs = new TaskCompletionSource<bool>();
-
-            void Handler(string data)
-            {
-                if (data.Contains(expectedResponse))
-                {
-                    tcs.TrySetResult(true);
-                }
-            }
-
-            DataReceived += Handler;
-
-            var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(timeoutMs));
-
-            DataReceived -= Handler;
-
-            return completedTask == tcs.Task;
+            File.WriteAllLines(filePath, _commandLog);
+            LogMessage("Journal des commandes enregistré dans : " + filePath);
         }
-
-        public void LogCommandsToFile(string filePath)
+        catch (UnauthorizedAccessException)
         {
-            try
-            {
-                File.WriteAllLines(filePath, _commandLog);
-                Console.WriteLine("Journal des commandes enregistré dans : " + filePath);
-            }
-            catch (Exception ex)
-            {
-                HandleError("Erreur lors de l'enregistrement du journal des commandes : " + ex.Message);
-            }
+            HandleError("Accès non autorisé pour enregistrer le fichier.");
         }
-
-        public static string[] GetAvailablePorts()
+        catch (IOException ex)
         {
-            return SerialPort.GetPortNames();
+            HandleError("Erreur d'entrée/sortie lors de l'enregistrement du journal : " + ex.Message);
         }
-
-        private void HandleError(string errorMessage)
+        catch (Exception ex)
         {
-            Console.WriteLine(errorMessage);
-            ErrorOccurred?.Invoke(errorMessage);
+            HandleError("Erreur inattendue lors de l'enregistrement du journal : " + ex.Message);
         }
+    }
 
-        public async Task<bool> PingArduinoAsync(int timeoutMs = 1000)
+    public static string[] GetAvailablePorts()
+    {
+        return SerialPort.GetPortNames();
+    }
+
+    private void HandleError(string errorMessage)
+    {
+        LogMessage(errorMessage);
+        ErrorOccurred?.Invoke(errorMessage);
+    }
+
+    private void LogMessage(string message)
+    {
+        try
         {
-            try
-            {
-                await SendSignalAsync("PING");
-                return await WaitForResponseAsync("PONG", timeoutMs);
-            }
-            catch (Exception ex)
-            {
-                HandleError("Erreur lors du ping de l'Arduino : " + ex.Message);
-                return false;
-            }
+            File.AppendAllText(_logFilePath, $"{DateTime.Now}: {message}{Environment.NewLine}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Erreur lors de l'écriture dans le fichier de log : " + ex.Message);
+        }
+    }
+
+    public async Task<bool> PingArduinoAsync(int timeoutMs = 1000)
+    {
+        try
+        {
+            await SendSignalAsync("PING");
+            return await WaitForResponseAsync("PONG", timeoutMs);
+        }
+        catch (Exception ex)
+        {
+            HandleError("Erreur lors du ping de l'Arduino : " + ex.Message);
+            return false;
         }
     }
 }
