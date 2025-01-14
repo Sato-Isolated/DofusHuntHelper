@@ -28,25 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
+            buttonCaptureCoords = new Button();
             richTextBox1 = new RichTextBox();
-            button2 = new Button();
-            label1 = new Label();
-            comboBox1 = new ComboBox();
-            textBox1 = new TextBox();
+            buttonStartStop = new Button();
+            lblCoordinates = new Label();
+            comboBoxScreens = new ComboBox();
+            textBoxPort = new TextBox();
             label2 = new Label();
             label3 = new Label();
             SuspendLayout();
             // 
             // button1
             // 
-            button1.Location = new Point(12, 12);
-            button1.Name = "button1";
-            button1.Size = new Size(119, 36);
-            button1.TabIndex = 0;
-            button1.Text = "Setup Coordonnée";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
+            buttonCaptureCoords.Location = new Point(12, 12);
+            buttonCaptureCoords.Name = "buttonCaptureCoords";
+            buttonCaptureCoords.Size = new Size(119, 36);
+            buttonCaptureCoords.TabIndex = 0;
+            buttonCaptureCoords.Text = "Setup Coordonnée";
+            buttonCaptureCoords.UseVisualStyleBackColor = true;
+            buttonCaptureCoords.Click += buttonCapture_Click;
             // 
             // richTextBox1
             // 
@@ -58,39 +58,39 @@
             // 
             // button2
             // 
-            button2.Location = new Point(12, 115);
-            button2.Name = "button2";
-            button2.Size = new Size(119, 36);
-            button2.TabIndex = 2;
-            button2.Text = "Start";
-            button2.UseVisualStyleBackColor = true;
-            button2.Click += button2_Click;
+            buttonStartStop.Location = new Point(12, 115);
+            buttonStartStop.Name = "button2";
+            buttonStartStop.Size = new Size(119, 36);
+            buttonStartStop.TabIndex = 2;
+            buttonStartStop.Text = "Start";
+            buttonStartStop.UseVisualStyleBackColor = true;
+            buttonStartStop.Click += buttonStartStop_Click;
             // 
             // label1
             // 
-            label1.AutoSize = true;
-            label1.Location = new Point(12, 73);
-            label1.Name = "label1";
-            label1.Size = new Size(84, 15);
-            label1.TabIndex = 3;
-            label1.Text = "Coordonnées: ";
+            lblCoordinates.AutoSize = true;
+            lblCoordinates.Location = new Point(12, 73);
+            lblCoordinates.Name = "lblCoordinates";
+            lblCoordinates.Size = new Size(84, 15);
+            lblCoordinates.TabIndex = 3;
+            lblCoordinates.Text = "Coordonnées: ";
             // 
             // comboBox1
             // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(590, 123);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(198, 23);
-            comboBox1.TabIndex = 4;
-            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            comboBoxScreens.FormattingEnabled = true;
+            comboBoxScreens.Location = new Point(590, 123);
+            comboBoxScreens.Name = "comboBoxScreens";
+            comboBoxScreens.Size = new Size(198, 23);
+            comboBoxScreens.TabIndex = 4;
+            comboBoxScreens.SelectedIndexChanged += comboBoxScreens_SelectedIndexChanged;
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(688, 20);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(100, 23);
-            textBox1.TabIndex = 5;
-            textBox1.Text = "COM6";
+            textBoxPort.Location = new Point(688, 20);
+            textBoxPort.Name = "textBoxPort";
+            textBoxPort.Size = new Size(100, 23);
+            textBoxPort.TabIndex = 5;
+            textBoxPort.Text = "COM6";
             // 
             // label2
             // 
@@ -117,12 +117,12 @@
             ClientSize = new Size(800, 346);
             Controls.Add(label3);
             Controls.Add(label2);
-            Controls.Add(textBox1);
-            Controls.Add(comboBox1);
-            Controls.Add(label1);
-            Controls.Add(button2);
+            Controls.Add(textBoxPort);
+            Controls.Add(comboBoxScreens);
+            Controls.Add(lblCoordinates);
+            Controls.Add(buttonStartStop);
             Controls.Add(richTextBox1);
-            Controls.Add(button1);
+            Controls.Add(buttonCaptureCoords);
             Name = "GUI";
             Text = "GUI";
             Load += GUI_Load;
@@ -132,13 +132,13 @@
 
         #endregion
 
-        private Button button1;
+        private Button buttonCaptureCoords;
         private RichTextBox richTextBox1;
-        private Button button2;
-        private Label label1;
-        private ComboBox comboBox1;
+        private Button buttonStartStop;
+        private Label lblCoordinates;
+        private ComboBox comboBoxScreens;
         private Label label2;
         private Label label3;
-        private TextBox textBox1;
+        private TextBox textBoxPort;
     }
 }
