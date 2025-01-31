@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GUI));
             buttonCaptureCoords = new Button();
             richTextBox1 = new RichTextBox();
             buttonStartStop = new Button();
@@ -36,9 +37,12 @@
             textBoxPort = new TextBox();
             label2 = new Label();
             label3 = new Label();
+            KeyboardModeCheckBox = new CheckBox();
+            groupBox1 = new GroupBox();
+            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
-            // button1
+            // buttonCaptureCoords
             // 
             buttonCaptureCoords.Location = new Point(12, 12);
             buttonCaptureCoords.Name = "buttonCaptureCoords";
@@ -50,43 +54,43 @@
             // 
             // richTextBox1
             // 
-            richTextBox1.Location = new Point(12, 157);
+            richTextBox1.Location = new Point(12, 209);
             richTextBox1.Name = "richTextBox1";
-            richTextBox1.Size = new Size(776, 179);
+            richTextBox1.Size = new Size(320, 179);
             richTextBox1.TabIndex = 1;
             richTextBox1.Text = "";
             // 
-            // button2
+            // buttonStartStop
             // 
-            buttonStartStop.Location = new Point(12, 115);
-            buttonStartStop.Name = "button2";
+            buttonStartStop.Location = new Point(213, 12);
+            buttonStartStop.Name = "buttonStartStop";
             buttonStartStop.Size = new Size(119, 36);
             buttonStartStop.TabIndex = 2;
             buttonStartStop.Text = "Start";
             buttonStartStop.UseVisualStyleBackColor = true;
             buttonStartStop.Click += buttonStartStop_Click;
             // 
-            // label1
+            // lblCoordinates
             // 
             lblCoordinates.AutoSize = true;
-            lblCoordinates.Location = new Point(12, 73);
+            lblCoordinates.Location = new Point(50, 31);
             lblCoordinates.Name = "lblCoordinates";
             lblCoordinates.Size = new Size(84, 15);
             lblCoordinates.TabIndex = 3;
             lblCoordinates.Text = "Coordonnées: ";
             // 
-            // comboBox1
+            // comboBoxScreens
             // 
             comboBoxScreens.FormattingEnabled = true;
-            comboBoxScreens.Location = new Point(590, 123);
+            comboBoxScreens.Location = new Point(140, 82);
             comboBoxScreens.Name = "comboBoxScreens";
-            comboBoxScreens.Size = new Size(198, 23);
+            comboBoxScreens.Size = new Size(100, 23);
             comboBoxScreens.TabIndex = 4;
             comboBoxScreens.SelectedIndexChanged += comboBoxScreens_SelectedIndexChanged;
             // 
-            // textBox1
+            // textBoxPort
             // 
-            textBoxPort.Location = new Point(688, 20);
+            textBoxPort.Location = new Point(140, 53);
             textBoxPort.Name = "textBoxPort";
             textBoxPort.Size = new Size(100, 23);
             textBoxPort.TabIndex = 5;
@@ -95,7 +99,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(619, 23);
+            label2.Location = new Point(71, 56);
             label2.Name = "label2";
             label2.Size = new Size(63, 15);
             label2.TabIndex = 6;
@@ -104,28 +108,52 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(536, 126);
+            label3.Location = new Point(86, 85);
             label3.Name = "label3";
             label3.Size = new Size(48, 15);
             label3.TabIndex = 7;
             label3.Text = "Screen: ";
             // 
+            // KeyboardModeCheckBox
+            // 
+            KeyboardModeCheckBox.AutoSize = true;
+            KeyboardModeCheckBox.Location = new Point(12, 54);
+            KeyboardModeCheckBox.Name = "KeyboardModeCheckBox";
+            KeyboardModeCheckBox.Size = new Size(110, 19);
+            KeyboardModeCheckBox.TabIndex = 8;
+            KeyboardModeCheckBox.Text = "Keyboard Mode";
+            KeyboardModeCheckBox.UseVisualStyleBackColor = true;
+            KeyboardModeCheckBox.CheckedChanged += checkBox1_CheckedChanged;
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(label2);
+            groupBox1.Controls.Add(lblCoordinates);
+            groupBox1.Controls.Add(label3);
+            groupBox1.Controls.Add(textBoxPort);
+            groupBox1.Controls.Add(comboBoxScreens);
+            groupBox1.Location = new Point(12, 79);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(320, 124);
+            groupBox1.TabIndex = 9;
+            groupBox1.TabStop = false;
+            // 
             // GUI
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 346);
-            Controls.Add(label3);
-            Controls.Add(label2);
-            Controls.Add(textBoxPort);
-            Controls.Add(comboBoxScreens);
-            Controls.Add(lblCoordinates);
+            ClientSize = new Size(347, 400);
+            Controls.Add(groupBox1);
+            Controls.Add(KeyboardModeCheckBox);
             Controls.Add(buttonStartStop);
             Controls.Add(richTextBox1);
             Controls.Add(buttonCaptureCoords);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "GUI";
-            Text = "GUI";
+            Text = "Dofus Hunt Helper";
             Load += GUI_Load;
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -140,5 +168,7 @@
         private Label label2;
         private Label label3;
         private TextBox textBoxPort;
+        private CheckBox KeyboardModeCheckBox;
+        private GroupBox groupBox1;
     }
 }

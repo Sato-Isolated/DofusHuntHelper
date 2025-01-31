@@ -1,13 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Diagnostics;
 using DofusHuntHelper.Core;
 using DofusHuntHelper.Arduino;
 using Serilog;
-using System.IO;
 
 namespace DofusHuntHelper
 {
@@ -16,42 +10,31 @@ namespace DofusHuntHelper
         private const int WH_MOUSE_LL = 14;
         private const int WM_LBUTTONDOWN = 0x0201;
 
-        // Mouse hook
         private readonly NativeMethods.HookProc _hookProc;
         private IntPtr _mouseHookHandle = IntPtr.Zero;
-
-        // Arduino
         private ArduinoController _arduinoController;
-
-        // Clipboard watcher
         private ClipboardWatcher? _clipboardWatcher;
         private bool _isRunning;
         private string _lastTravelText = string.Empty;
-
-        // Les paramètres
         private AppSettings _settings;
+        private KeyboardSimulator _keyboardSimulator;
+        private bool _useKeyboardSimulator;
 
         public GUI()
         {
             InitializeComponent();
 
-            // Charger les settings
             _settings = SettingsManager.LoadSettings();
-
-            // Delegate du mouse hook
             _hookProc = MouseHookCallback;
+            _keyboardSimulator = new KeyboardSimulator();
 
-            // Init l'UI
             textBoxPort.Text = _settings.Port;
             lblCoordinates.Text = $"Coordonnée: X={_settings.X}, Y={_settings.Y}";
             richTextBox1.AppendText(
                 $"Paramètres chargés: X={_settings.X}, Y={_settings.Y}, Port={_settings.Port}, " +
                 $"Process={_settings.ProcessName}, Interval={_settings.ClipboardCheckIntervalMs} ms\n");
 
-            // Instancie le contrôleur Arduino
             _arduinoController = new ArduinoController(_settings.Port);
-
-            // Mise à jour du port quand la textbox change
             textBoxPort.TextChanged += (s, e) => UpdateArduinoPort();
         }
 
@@ -66,11 +49,8 @@ namespace DofusHuntHelper
                 comboBoxScreens.SelectedIndex = 0;
         }
 
-        #region Mouse Hook
-
         private void buttonCapture_Click(object sender, EventArgs e)
         {
-            // Installe le hook souris
             _mouseHookHandle = NativeMethods.SetWindowsHookEx(
                 WH_MOUSE_LL,
                 _hookProc,
@@ -89,12 +69,10 @@ namespace DofusHuntHelper
                     lblCoordinates.Text = $"Coordonnée: X={point.X}, Y={point.Y}";
                     richTextBox1.AppendText($"Coordonnée sauvegardée: X={point.X}, Y={point.Y}\n");
 
-                    // Mise à jour dans settings
                     _settings.X = point.X;
                     _settings.Y = point.Y;
                     SettingsManager.SaveSettings(_settings);
 
-                    // Retire le hook
                     NativeMethods.UnhookWindowsHookEx(_mouseHookHandle);
                     _mouseHookHandle = IntPtr.Zero;
 
@@ -106,10 +84,6 @@ namespace DofusHuntHelper
             }
             return NativeMethods.CallNextHookEx(_mouseHookHandle, nCode, wParam, lParam);
         }
-
-        #endregion
-
-        #region Clipboard Monitoring
 
         private void buttonStartStop_Click(object sender, EventArgs e)
         {
@@ -128,7 +102,7 @@ namespace DofusHuntHelper
             _isRunning = true;
             buttonStartStop.Text = "Stop";
 
-            if (!_arduinoController.Connect())
+            if (!_useKeyboardSimulator && !_arduinoController.Connect())
             {
                 Log.Error("Failed to connect Arduino on port {Port}", _settings.Port);
                 MessageBox.Show("Échec de la connexion à l'Arduino.", "Erreur",
@@ -138,7 +112,6 @@ namespace DofusHuntHelper
                 return;
             }
 
-            // Créer le ClipboardWatcher
             _clipboardWatcher = new ClipboardWatcher(_settings.ClipboardCheckIntervalMs);
             _clipboardWatcher.OnClipboardTextChanged += OnClipboardTextChanged;
             _clipboardWatcher.OnError += OnClipboardError;
@@ -155,7 +128,6 @@ namespace DofusHuntHelper
                 return;
             }
 
-            // On ne traite l'action que si c'est un texte avec "/travel"
             if (newText != _lastTravelText && newText.Contains("/travel"))
             {
                 _lastTravelText = newText;
@@ -186,18 +158,16 @@ namespace DofusHuntHelper
             _clipboardWatcher?.Stop();
             _clipboardWatcher = null;
 
-            _arduinoController.Disconnect();
+            if (!_useKeyboardSimulator)
+            {
+                _arduinoController.Disconnect();
+            }
 
             Log.Information("Clipboard monitoring stopped.");
         }
 
-        #endregion
-
-        #region Travel Command
-
         private async void PerformTravelCommandAsync(int savedX, int savedY)
         {
-            // Sélection de l'écran
             var selectedIndex = comboBoxScreens.SelectedIndex;
             if (selectedIndex < 0 || selectedIndex >= Screen.AllScreens.Length)
             {
@@ -208,7 +178,6 @@ namespace DofusHuntHelper
             var screenBounds = Screen.AllScreens[selectedIndex].Bounds;
             Cursor.Position = new Point(screenBounds.X + savedX, screenBounds.Y + savedY);
 
-            // On récupère le(s) process 
             var processes = Process.GetProcessesByName(_settings.ProcessName);
             if (processes.Length == 0)
             {
@@ -225,33 +194,61 @@ namespace DofusHuntHelper
             var process = processes[0];
             var handle = process.MainWindowHandle;
 
-            // Met la fenêtre au premier plan
             NativeMethods.SetForegroundWindow(handle);
-
-            // Clic gauche
             NativeMethods.mouse_event(
                 NativeMethods.MOUSEEVENTF_LEFTDOWN | NativeMethods.MOUSEEVENTF_LEFTUP,
                 0, 0, 0, 0);
 
-            // Colle le contenu (Ctrl + V)
-            NativeMethods.SetForegroundWindow(handle);
-            SendKeys.SendWait("^v");
-
-            // Re-focalise le process
             NativeMethods.SetForegroundWindow(handle);
 
-            // Envoie 2x la commande "1" à l’Arduino
-            await _arduinoController.SendCommandAsync("1");
-            await Task.Delay(200);
-            await _arduinoController.SendCommandAsync("1");
+            // Collage du texte
+            if (_useKeyboardSimulator)
+            {
+                try
+                {
+                    _keyboardSimulator.SendCombination(
+                        KeyboardSimulator.VirtualKey.VK_CONTROL,
+                        KeyboardSimulator.VirtualKey.VK_V);
+                    await Task.Delay(50);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Erreur lors de la simulation clavier");
+                    richTextBox1.AppendText($"Erreur clavier: {ex.Message}\n");
+                }
+            }
+            else
+            {
+                SendKeys.SendWait("^v");
+            }
+
+            NativeMethods.SetForegroundWindow(handle);
+
+            // Envoi des commandes
+            if (_useKeyboardSimulator)
+            {
+                try
+                {
+                    _keyboardSimulator.SendRealisticEnter();
+                    await Task.Delay(200);
+                    _keyboardSimulator.SendRealisticEnter();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Erreur lors de la simulation clavier");
+                    richTextBox1.AppendText($"Erreur clavier: {ex.Message}\n");
+                }
+            }
+            else
+            {
+                await _arduinoController.SendCommandAsync("1");
+                await Task.Delay(200);
+                await _arduinoController.SendCommandAsync("1");
+            }
 
             richTextBox1.AppendText("Action exécutée avec succès sur l'écran sélectionné !\n");
             Log.Information("Travel command executed successfully.");
         }
-
-        #endregion
-
-        #region Screen Indicator
 
         private void comboBoxScreens_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -272,7 +269,8 @@ namespace DofusHuntHelper
                 FormBorderStyle = FormBorderStyle.None,
                 StartPosition = FormStartPosition.Manual,
                 Bounds = new Rectangle(screen.Bounds.Right - 200, screen.Bounds.Top + 50, 150, 150),
-                TopMost = true
+                TopMost = true,
+                Icon = Icon
             };
 
             var label = new Label
@@ -302,10 +300,6 @@ namespace DofusHuntHelper
             });
         }
 
-        #endregion
-
-        #region Update Arduino Port
-
         private void UpdateArduinoPort()
         {
             if (_arduinoController != null && _arduinoController.Connect())
@@ -320,6 +314,20 @@ namespace DofusHuntHelper
             Log.Information("Arduino port updated to {Port}.", _settings.Port);
         }
 
-        #endregion
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            _useKeyboardSimulator = KeyboardModeCheckBox.Checked;
+            textBoxPort.Enabled = !_useKeyboardSimulator;
+
+            if (_useKeyboardSimulator)
+            {
+                _arduinoController?.Disconnect();
+                richTextBox1.AppendText("Mode clavier virtuel activé\n");
+            }
+            else
+            {
+                richTextBox1.AppendText("Mode Arduino activé\n");
+            }
+        }
     }
 }

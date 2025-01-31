@@ -8,7 +8,19 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+		<ApplicationIcon>dfs01-pourpre_orig.ico</ApplicationIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Hooks\**" />
+	  <EmbeddedResource Remove="Hooks\**" />
+	  <None Remove="Hooks\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="dfs01-pourpre_orig.ico" />
+	  <Content Include="UI\dfs01-pourpre_orig.ico" />
+	</ItemGroup>
 
 	<ItemGroup>
     <PackageReference Include="Serilog" Version="4.2.0" />
@@ -16,8 +28,19 @@
     <PackageReference Include="System.IO.Ports" Version="9.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Hooks\" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Properties\Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
 
 </Project>
