@@ -129,4 +129,6 @@ This project is licensed under the MIT License. You are free to use, modify, and
 - 💻 **Improving the graphical interface** : Create a more intuitive and user-friendly interface.
 - 🔌 **Automatic serial port management** : Detect and automatically configure the serial port used by the Arduino.
 
+## Support the project
+If you wish to support this project, you can make a donation in Kamas on the **Dakal 6** server at **Twisted-Fail** (*Zed-Moe#1693 [#4052]*).
 </details>
