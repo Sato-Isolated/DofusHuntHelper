@@ -1,9 +1,10 @@
 name: Build et Release
 
 on:
+  workflow_dispatch:  # Permet de déclencher manuellement la workflow depuis l’interface GitHub
   push:
     tags:
-      - 'v*'  # Déclenche la workflow lors d'un push de tag (ex. v1.0.0)
+      - 'v*'  # Déclenchement automatique lors d’un push de tag (ex. v1.0.0)
 
 jobs:
   build:
