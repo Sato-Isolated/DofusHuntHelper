@@ -33,7 +33,7 @@ jobs:
         run: dotnet build DofusHuntHelper.sln --configuration Release --no-restore
 
       - name: Publier l'application
-        run: dotnet publish DofusHuntHelper.sln --configuration Release --runtime win-x64 --self-contained true --output publish
+        run: dotnet publish DofusHuntHelper.sln --configuration Release --runtime win-x64 --self-contained false --output publish
 
       - name: Créer l'archive des fichiers publiés
         run: Compress-Archive -Path publish\* -DestinationPath DofusHuntHelper.zip
