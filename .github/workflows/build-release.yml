@@ -1,0 +1,60 @@
+name: Build et Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Déclenche la workflow lors d'un push de tag (ex. v1.0.0)
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Récupération du code source
+      - name: Récupérer le code source
+        uses: actions/checkout@v3
+
+      # Installation de .NET 8
+      - name: Configurer .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      # Restauration des dépendances
+      - name: Restaurer les dépendances
+        run: dotnet restore DofusHuntHelper.sln
+
+      # Compilation de la solution en mode Release
+      - name: Compiler la solution
+        run: dotnet build DofusHuntHelper.sln --configuration Release --no-restore
+
+      # Publication de l'application pour Windows en mode self-contained
+      - name: Publier l'application
+        run: dotnet publish DofusHuntHelper.sln --configuration Release --runtime win-x64 --self-contained true --output publish
+
+      # Création d'une archive (ZIP) du dossier de publication
+      - name: Créer l'archive des fichiers publiés
+        run: Compress-Archive -Path publish\* -DestinationPath DofusHuntHelper.zip
+
+      # Création de la release GitHub
+      - name: Créer la release GitHub
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: "Release ${{ github.ref }}"
+          draft: false
+          prerelease: false
+
+      # Upload de l'archive en tant qu'asset de la release
+      - name: Upload de l'asset sur la release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: DofusHuntHelper.zip
+          asset_name: DofusHuntHelper.zip
+          asset_content_type: application/zip
