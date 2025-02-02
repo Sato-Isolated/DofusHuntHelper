@@ -38,7 +38,7 @@ Bien que DofusDB soit un exemple courant, l'application fonctionne avec tout sit
 
 ## Utilisation
 1. **Avec Arduino** : Connectez l'Arduino et cliquez sur "Start".
-2. **Sans Arduino** : Lancez simplement l'application et cochez la checkbox 'Keyboard Mode' pour utilisez les fonctionnalités avec le clavier et la souris.
+2. **Sans Arduino** : Lancez simplement l'application et utilisez les fonctionnalités avec le clavier et la souris.
 3. Capturez les coordonnées avec "Capture".
 4. Copiez une commande `/travel` dans le presse-papier depuis un site ou outil de chasse au trésor.
 5. L'application déplacera automatiquement la souris vers le chat de Dofus, collera la commande, et effectuera deux pressions sur Entrée pour valider la commande.
@@ -60,6 +60,12 @@ Ce projet est sous licence MIT. Vous pouvez l'utiliser, le modifier et le redist
 - 🛠️ **Utilisation sans Arduino** (terminé) : Ajout d'une option pour fonctionner sans connexion Arduino, en utilisant uniquement des interactions clavier/souris.
 - 💻 **Amélioration de l'interface graphique** : Créer une interface plus intuitive et conviviale.
 - 🔌 **Gestion automatique du port série** : Détecter et configurer automatiquement le port série utilisé par l'Arduino.
+
+---
+
+## Soutenir le projet
+Si vous souhaitez soutenir ce projet, vous pouvez faire un don en kamas sur le serveur **Dakal 6** à **Twisted-Fail** (*Zed-Moe#1693 [#4052]*)
+
 </details>
 
 <details>
@@ -100,7 +106,7 @@ Although DofusDB is a common example, the application works with any site or too
 
 ## Usage
 1. **With Arduino**: Connect the Arduino and click "Start".
-2. **Without Arduino** : Simply launch the application and check the ‘Keyboard Mode’ checkbox to use keyboard and mouse functions.
+2. **Without Arduino**: Simply launch the application and use the features with the keyboard and mouse.
 3. Capture the coordinates with "Capture".
 4. Copy a `/travel` command to the clipboard from any treasure hunt site or tool.
 5. The application will automatically move the mouse to the Dofus chat, paste the command, and press Enter twice to execute it.
@@ -122,4 +128,5 @@ This project is licensed under the MIT License. You are free to use, modify, and
 - 🛠️ **Usage without Arduino** (completed) : Added an option to operate without an Arduino connection, using only keyboard/mouse interactions.
 - 💻 **Improving the graphical interface** : Create a more intuitive and user-friendly interface.
 - 🔌 **Automatic serial port management** : Detect and automatically configure the serial port used by the Arduino.
+
 </details>
