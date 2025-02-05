@@ -65,7 +65,7 @@ Ce projet est sous licence MIT. Vous pouvez l'utiliser, le modifier et le redist
 ---
 
 ## Soutenir le projet
-Si vous souhaitez soutenir ce projet, vous pouvez faire un don en kamas sur le serveur **Dakal 6** à **Twisted-Fail** (*Zed-Moe#1693 [#4052]*)
+Si vous souhaitez soutenir ce projet, vous pouvez faire un don en kamas sur le serveur **Dakal 6** à **Twisted-Fail**
 
 </details>
 
@@ -131,5 +131,5 @@ This project is licensed under the MIT License. You are free to use, modify, and
 - 🔌 **Automatic serial port management** : Detect and automatically configure the serial port used by the Arduino.
 
 ## Support the project
-If you wish to support this project, you can make a donation in Kamas on the **Dakal 6** server at **Twisted-Fail** (*Zed-Moe#1693 [#4052]*).
+If you wish to support this project, you can make a donation in Kamas on the **Dakal 6** server at **Twisted-Fail**.
 </details>
