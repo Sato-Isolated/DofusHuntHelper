@@ -1,48 +1,45 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 
-namespace DofusHuntHelper.Core
+namespace DofusHuntHelper.Core;
+
+public static class SettingsManager
 {
-    public static class SettingsManager
+    private static readonly string SettingsPath =
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new() { WriteIndented = true };
+
+    public static AppSettings LoadSettings()
     {
-        private static readonly string SettingsPath =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+        if (!File.Exists(SettingsPath))
+            // Fichier inexistant => on retourne une config par défaut
+            return new AppSettings();
 
-        public static AppSettings LoadSettings()
+        try
         {
-            if (!File.Exists(SettingsPath))
-            {
-                // Fichier inexistant => on retourne une config par défaut
-                return new AppSettings();
-            }
-
-            try
-            {
-                var json = File.ReadAllText(SettingsPath);
-                var settings = JsonSerializer.Deserialize<AppSettings>(json);
-                return settings ?? new AppSettings();
-            }
-            catch
-            {
-                // En cas d’erreur, on ne veut pas crasher l’appli
-                return new AppSettings();
-            }
+            var json = File.ReadAllText(SettingsPath);
+            var settings = JsonSerializer.Deserialize<AppSettings>(json);
+            return settings ?? new AppSettings();
         }
-
-        public static void SaveSettings(AppSettings settings)
+        catch
         {
-            try
-            {
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                var json = JsonSerializer.Serialize(settings, options);
+            // En cas d’erreur, on ne veut pas crasher l’appli
+            return new AppSettings();
+        }
+    }
 
-                File.WriteAllText(SettingsPath, json);
-            }
-            catch
-            {
-                // Vous pouvez loguer, afficher un message, etc.
-            }
+    public static void SaveSettings(AppSettings settings)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(settings, JsonSerializerOptions);
+
+            File.WriteAllText(SettingsPath, json);
+        }
+        catch
+        {
+            // Vous pouvez loguer, afficher un message, etc.
         }
     }
 }

@@ -1,46 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+	  <!-- Active WPF -->
+	  <UseWPF>true</UseWPF>
 
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows</TargetFramework>
-		<Nullable>enable</Nullable>
-		<UseWindowsForms>true</UseWindowsForms>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<ApplicationIcon>dfs01-pourpre_orig.ico</ApplicationIcon>
-	</PropertyGroup>
+	  <!-- Active Windows Forms dans un projet WPF -->
+	  <UseWindowsForms>true</UseWindowsForms>
 
-	<ItemGroup>
-	  <Compile Remove="Hooks\**" />
-	  <EmbeddedResource Remove="Hooks\**" />
-	  <None Remove="Hooks\**" />
-	</ItemGroup>
+	  <!-- Indique que l'application a besoin de Windows (si c'est vraiment le cas) -->
+	  <EnableWindowsTargeting>true</EnableWindowsTargeting>
+	  <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
 
-	<ItemGroup>
-	  <Content Include="dfs01-pourpre_orig.ico" />
-	  <Content Include="UI\dfs01-pourpre_orig.ico" />
-	</ItemGroup>
-
-	<ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.1">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Serilog" Version="4.2.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="System.IO.Ports" Version="9.0.0" />
+    <PackageReference Include="SukiUI" Version="6.0.0-rc" />
+    <PackageReference Include="System.IO.Ports" Version="9.0.1" />
   </ItemGroup>
-
-	<ItemGroup>
-	  <Compile Update="Properties\Resources.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>Resources.resx</DependentUpon>
-	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <EmbeddedResource Update="Properties\Resources.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	</ItemGroup>
-
 </Project>

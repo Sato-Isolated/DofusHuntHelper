@@ -1,45 +1,41 @@
-using System;
-using System.Windows.Forms;
+ï»¿using Avalonia;
 using Serilog;
 
-namespace DofusHuntHelper
+namespace DofusHuntHelper;
+
+internal class Program
 {
-    internal static class Program
+    // Initialization code. Don't use any Avalonia, third-party APIs or any
+    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+    // yet and stuff might break.
+    [STAThread]
+    public static void Main(string[] args)
     {
-        [STAThread]
-        static void Main()
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.File("logs/log.log", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        try
         {
-            // 1) Configuration de Serilog
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                // On écrit dans un fichier "app.log" avec rotation journalière :
-                .WriteTo.File(
-                    path: "app.log",
-                    rollingInterval: RollingInterval.Day,
-                    retainedFileCountLimit: 7, // garder 7 jours
-                    rollOnFileSizeLimit: true)
-                // Optionnel: on écrit aussi en console (utile en debug)
-                .CreateLogger();
-
-            // 2) Démarrage de l'application WinForms
-            Application.SetHighDpiMode(HighDpiMode.SystemAware);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            try
-            {
-                Log.Information("Application starting up...");
-                Application.Run(new GUI());
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "Application terminated unexpectedly.");
-            }
-            finally
-            {
-                // On flush et on ferme proprement le logger
-                Log.CloseAndFlush();
-            }
+            Log.Information("Starting application");
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
         }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Application start-up failed");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
+    }
+
+    // Avalonia configuration, don't remove; also used by visual designer.
+    public static AppBuilder BuildAvaloniaApp()
+    {
+        return AppBuilder.Configure<App>()
+            .UsePlatformDetect()
+            .WithInterFont()
+            .LogToTrace();
     }
 }

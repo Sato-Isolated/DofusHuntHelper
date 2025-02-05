@@ -1,0 +1,99 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:suki="https://github.com/kikipoulet/SukiUI"
+                 xmlns:local="clr-namespace:DofusHuntHelper.ViewModel"
+                 mc:Ignorable="d" Width="800" Height="450"
+                 x:Class="DofusHuntHelper.View.MainWindow"
+                 x:DataType="local:MainViewModel"
+                 Title="DofusHuntHelper">
+
+    <Grid>
+        <TabControl Margin="10">
+            <!-- Onglet 1 : Chasse au trésor -->
+            <TabItem Header="Chasse au trésor">
+                <Grid Margin="10">
+
+                    <!-- On peut utiliser un Grid pour structurer -->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Ligne 0 : Boutons Setup & Start/Stop -->
+                    <StackPanel Grid.Row="0" Grid.ColumnSpan="2"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Spacing="10">
+                        <Button Content="Setup Coordonnée"
+                                Width="200"
+                                Command="{Binding CaptureCoordinatesCommand}" />
+                        <Button Content="{Binding StartStopButtonText}"
+                                Width="100"
+                                Command="{Binding StartStopCommand}" />
+                    </StackPanel>
+
+                    <!-- Ligne 1 : Checkbox + Label coordonnées -->
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0"
+                                Orientation="Vertical"
+                                HorizontalAlignment="Center"
+                                Spacing="10" Margin="0,10,0,0">
+                        <CheckBox Content="Keyboard Mode"
+                                  IsChecked="{Binding UseKeyboardSimulator}" />
+                        <Label Content="{Binding CoordinatesDisplay}" />
+                    </StackPanel>
+
+                    <!-- Ligne 2 : Serial Port / Screen -->
+                    <StackPanel Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center">
+                        <TextBlock Text="Serial Port" Margin="240,0,0,5" />
+                        <TextBox Text="{Binding Port}"
+                                 Width="150"
+                                 TextAlignment="Center"
+                                 Margin="200 0 0 0" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center">
+                        <TextBlock Text="Screen" Margin="-150,0,0,5" />
+                        <ComboBox ItemsSource="{Binding ScreenNames}"
+                                  SelectedIndex="{Binding SelectedScreenIndex}"
+                                  Width="150"
+                                  Margin="-250 0 0 0" />
+                    </StackPanel>
+
+                    <!-- Ligne 3 : TextBox de log -->
+                    <TextBox Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0"
+                             Margin="5"
+                             Text="{Binding OutputLog}"
+                             AcceptsReturn="True" />
+                </Grid>
+            </TabItem>
+
+            <!-- Onglet 2 : Fast Réponse -->
+            <TabItem Header="Fast Réponse Métier (WIP)" IsEnabled="False">
+                <TabControl Margin="10">
+                    <TabItem Header="Alchimiste">
+                        <StackPanel>
+                            <TextBlock HorizontalAlignment="Center" Text="Message prédéfini" />
+                            <TextBox Text="blablabla"
+                                     Height="225"
+                                     AcceptsReturn="True" />
+                            <Button Content="Send" Width="150" Margin="0 5 0 0" Classes="Outlined" />
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
+            </TabItem>
+
+            <!-- Onglet 3 : Réglage -->
+            <TabItem Header="Réglage(WIP)" IsEnabled="False">
+                <!-- Idem, autres réglages -->
+            </TabItem>
+        </TabControl>
+    </Grid>
+</suki:SukiWindow>

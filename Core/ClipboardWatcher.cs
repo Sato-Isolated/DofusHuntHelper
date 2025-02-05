@@ -1,76 +1,103 @@
-﻿using System;
-using System.Threading;
-using System.Windows.Forms;
+﻿using System.Diagnostics;
+using System.Windows.Threading;
 using Serilog;
+using Clipboard = System.Windows.Clipboard;
 
-namespace DofusHuntHelper.Core
+namespace DofusHuntHelper.Core;
+
+public class ClipboardWatcher : IDisposable
 {
-    public class ClipboardWatcher : IDisposable
+    private readonly int _intervalMs;
+    private readonly DispatcherTimer _timer;
+    private string _lastText = string.Empty;
+
+    /// <summary>
+    ///     Initialise un ClipboardWatcher qui surveille le presse-papier toutes les <paramref name="intervalMs" />
+    ///     millisecondes.
+    /// </summary>
+    /// <param name="intervalMs">Intervalle de vérification en millisecondes</param>
+    public ClipboardWatcher(int intervalMs = 500)
     {
-        private Thread? _watcherThread;
-        private bool _isRunning;
-        private string _lastText = string.Empty;
-        private readonly int _intervalMs;
+        _intervalMs = intervalMs;
 
-        public event Action<string>? OnClipboardTextChanged;
-        public event Action<Exception>? OnError;
-
-        public ClipboardWatcher(int intervalMs = 500)
+        // Configuration du timer WPF
+        _timer = new DispatcherTimer
         {
-            _intervalMs = intervalMs;
+            Interval = TimeSpan.FromMilliseconds(intervalMs)
+        };
+        _timer.Tick += Timer_Tick;
+
+        Debug.Print("[ClipboardWatcher] Instance créée avec un intervalle de {0} ms.", intervalMs);
+    }
+
+    /// <summary>
+    ///     Libère les ressources utilisées par le ClipboardWatcher.
+    /// </summary>
+    public void Dispose()
+    {
+        Debug.Print("[ClipboardWatcher] Dispose() appelé. Nettoyage des ressources...");
+        Stop();
+        _timer.Tick -= Timer_Tick;
+        GC.SuppressFinalize(this);
+    }
+
+    public event Action<string>? OnClipboardTextChanged;
+    public event Action<Exception>? OnError;
+
+    /// <summary>
+    ///     Démarre la surveillance du presse-papier.
+    /// </summary>
+    public void Start()
+    {
+        if (_timer.IsEnabled)
+        {
+            Debug.Print("[ClipboardWatcher] Start() appelé alors que la surveillance est déjà active.");
+            return;
         }
 
-        public void Start()
-        {
-            if (_isRunning) return;
-            _isRunning = true;
+        Log.Information("[ClipboardWatcher] Surveillance du presse-papier démarrée (toutes les {Interval} ms).",
+            _intervalMs);
+        _timer.Start();
+    }
 
-            _watcherThread = new Thread(WatchClipboard);
-            _watcherThread.SetApartmentState(ApartmentState.STA);
-            _watcherThread.Start();
-            Log.Information("ClipboardWatcher started with interval {Interval} ms", _intervalMs);
+    /// <summary>
+    ///     Arrête la surveillance du presse-papier.
+    /// </summary>
+    public void Stop()
+    {
+        if (!_timer.IsEnabled)
+        {
+            Debug.Print("[ClipboardWatcher] Stop() appelé alors que la surveillance n'est pas active.");
+            return;
         }
 
-        private void WatchClipboard()
+        Log.Information("[ClipboardWatcher] Surveillance du presse-papier arrêtée.");
+        _timer.Stop();
+    }
+
+    /// <summary>
+    ///     Méthode appelée à chaque Tick du DispatcherTimer.
+    /// </summary>
+    private void Timer_Tick(object? sender, EventArgs e)
+    {
+        try
         {
-            while (_isRunning)
+            var currentText = Clipboard.GetText();
+            Log.Verbose("[ClipboardWatcher] Contenu actuel du presse-papier : {Text}", currentText);
+
+            // Déclenchement de l'événement seulement si le texte a changé
+            if (currentText != _lastText)
             {
-                try
-                {
-                    if (Clipboard.ContainsText())
-                    {
-                        var currentText = Clipboard.GetText();
-                        if (currentText != _lastText)
-                        {
-                            _lastText = currentText;
-                            Log.Debug("[ClipboardWatcher] New text: {Text}", currentText);
-                            OnClipboardTextChanged?.Invoke(currentText);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "[ClipboardWatcher] Error reading clipboard");
-                    OnError?.Invoke(ex);
-                }
-                Thread.Sleep(_intervalMs);
+                _lastText = currentText;
+                Log.Information("[ClipboardWatcher] Nouveau texte détecté : {Text}", currentText);
+
+                OnClipboardTextChanged?.Invoke(currentText);
             }
         }
-
-        public void Stop()
+        catch (Exception ex)
         {
-            _isRunning = false;
-            if (_watcherThread != null && _watcherThread.IsAlive)
-            {
-                _watcherThread.Join();
-                _watcherThread = null;
-            }
-            Log.Information("ClipboardWatcher stopped.");
-        }
-
-        public void Dispose()
-        {
-            Stop();
+            Log.Error(ex, "[ClipboardWatcher] Erreur lors de la lecture du presse-papier.");
+            OnError?.Invoke(ex);
         }
     }
 }
