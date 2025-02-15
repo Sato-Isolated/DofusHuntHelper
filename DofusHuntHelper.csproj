@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -15,21 +15,43 @@
 	  <!-- Indique que l'application a besoin de Windows (si c'est vraiment le cas) -->
 	  <EnableWindowsTargeting>true</EnableWindowsTargeting>
 	  <ImplicitUsings>enable</ImplicitUsings>
+	  <PlatformTarget>x64</PlatformTarget>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <RepositoryUrl></RepositoryUrl>
+	  <PackageProjectUrl>https://github.com/Sato-Isolated/DofusHuntHelper</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.1" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.1" />
+    <PackageReference Include="Avalonia" Version="11.2.4" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.2.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.4" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.4" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.1">
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.2.4">
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Serilog" Version="4.2.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="SukiUI" Version="6.0.0-rc" />
-    <PackageReference Include="System.IO.Ports" Version="9.0.1" />
+    <PackageReference Include="SukiUI" Version="6.0.0" />
+    <PackageReference Include="System.IO.Ports" Version="9.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="View\SettingsTab.axaml.cs">
+      <DependentUpon>SettingsTab.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="View\MessageTab.axaml.cs">
+      <DependentUpon>MessageTab.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="View\TreasureHuntTab.axaml.cs">
+      <DependentUpon>TreasureHuntTab.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>

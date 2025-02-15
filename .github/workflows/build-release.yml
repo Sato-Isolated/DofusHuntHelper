@@ -26,17 +26,17 @@ jobs:
       - name: Configurer .NET
         uses: actions/setup-dotnet@v3
         with:
-          # Utilise la version 8.x de .NET
-          dotnet-version: '8.0.x'
+          # Utilise la version 9.x de .NET
+          dotnet-version: '9.0.x'
 
       - name: Restaurer les dépendances
         run: dotnet restore DofusHuntHelper.sln
 
       - name: Compiler la solution (Release, framework Windows)
-        run: dotnet build DofusHuntHelper.sln --configuration Release --framework net8.0-windows --no-restore
+        run: dotnet build DofusHuntHelper.sln --configuration Release --framework net9.0-windows --no-restore
 
       - name: Publier l'application (runtime Windows 64-bit)
-        run: dotnet publish DofusHuntHelper.sln --configuration Release --framework net8.0-windows --runtime win-x64 --self-contained false --output publish
+        run: dotnet publish DofusHuntHelper.sln --configuration Release --framework net9.0-windows --runtime win-x64 --self-contained true --output publish
 
       - name: Créer l'archive des fichiers publiés
         run: Compress-Archive -Path publish\* -DestinationPath DofusHuntHelper.zip
