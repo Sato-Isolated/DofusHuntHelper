@@ -1,5 +1,5 @@
 # Dofus Hunt Helper
-![image](https://github.com/user-attachments/assets/4becace4-91bc-497f-be4b-32e52cd3586b)
+![image](https://github.com/user-attachments/assets/312981d0-8f9c-4891-974a-ccba5ae4abc3)
 
 <details>
 <summary>🇫🇷 Version Française</summary>
