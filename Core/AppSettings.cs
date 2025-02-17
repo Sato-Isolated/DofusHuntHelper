@@ -19,7 +19,7 @@
         /// <summary>
         /// Nom du port série à utiliser (par défaut <c>"COM3"</c>).
         /// </summary>
-        public string Port { get; set; } = "COM3";
+       // public string Port { get; set; } = "COM3";
 
         /// <summary>
         /// Nom du processus à cibler (par défaut <c>"Dofus"</c>).

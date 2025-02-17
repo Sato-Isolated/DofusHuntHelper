@@ -29,8 +29,9 @@ namespace DofusHuntHelper.ViewModel
         #region Champs privés
 
         private bool _isRunning;
-        private bool _useKeyboardSimulator;
-        private string _port;
+        // le KeyboardMode sera activer par défaut 
+        // private bool _useKeyboardSimulator;
+        // private string _port;
         private string _coordinatesDisplay;
         private string _outputLog;
         private int _selectedScreenIndex;
@@ -46,7 +47,10 @@ namespace DofusHuntHelper.ViewModel
         // Paramètres et dépendances
         private readonly AppSettings _settings;
 
-        private ArduinoController _arduinoController;
+        // On désactive toutes les références à l'Arduino,  
+        // car le mode clavier le remplace désormais et rend l'Arduino inutile.  
+        // Toutefois, la classe est conservée au cas où un retour en arrière serait nécessaire.
+        //private ArduinoController _arduinoController;
         private ClipboardWatcher? _clipboardWatcher;
         private string _lastTravelText = string.Empty;
 
@@ -64,20 +68,20 @@ namespace DofusHuntHelper.ViewModel
 
             // Chargement des paramètres
             _settings = SettingsManager.LoadSettings();
-            Debug.Print("Paramètres chargés : X={0}, Y={1}, Port={2}, Process={3}, Interval={4} ms",
-                _settings.X, _settings.Y, _settings.Port, _settings.ProcessName, _settings.ClipboardCheckIntervalMs);
+            Debug.Print("Paramètres chargés : X={0}, Y={1}, Process={2}, Interval={3} ms",
+                _settings.X, _settings.Y, _settings.ProcessName, _settings.ClipboardCheckIntervalMs);
 
             // Affectations initiales
             _hookProc = MouseHookCallback;
-            _port = _settings.Port;
             _coordinatesDisplay = $"Coordonnée: X={_settings.X}, Y={_settings.Y}";
             _outputLog = $"Paramètres chargés: X={_settings.X}, Y={_settings.Y}, " +
-                         $"Port={_settings.Port}, Process={_settings.ProcessName}, " +
+                         $"Process={_settings.ProcessName}, " +
                          $"Interval={_settings.ClipboardCheckIntervalMs} ms\n";
 
             // Initialisation de l’Arduino
-            _arduinoController = new ArduinoController(_port);
-            Debug.Print("ArduinoController créé pour le port {0}", _port);
+            // _arduinoController = new ArduinoController(_port);
+            //Debug.Print("ArduinoController créé pour le port {0}", _port);
+
 
             // Préparation de la liste des écrans détectés
             _screenNames = new ObservableCollection<string>();
@@ -160,8 +164,8 @@ namespace DofusHuntHelper.ViewModel
             NativeMethods.SetForegroundWindow(handle);
 
             // Envoie la commande "/travel" soit via le simulateur, soit via l'Arduino
-            if (UseKeyboardSimulator)
-            {
+            //if (UseKeyboardSimulator)
+            //{
                 try
                 {
                     Debug.Print("[MainViewModel] Envoi de la commande via KeyboardSimulator (Ctrl+V + ENTER)");
@@ -177,21 +181,21 @@ namespace DofusHuntHelper.ViewModel
                 {
                     AppendLog($"Erreur clavier: {ex.Message}\n");
                 }
-            }
-            else
-            {
-                try
-                {
-                    Debug.Print("[MainViewModel] Envoi de la commande via Arduino");
-                    await _arduinoController.SendCommandAsync("1");
-                    await Task.Delay(200);
-                    await _arduinoController.SendCommandAsync("1");
-                }
-                catch (Exception ex)
-                {
-                    AppendLog($"Erreur Arduino: {ex.Message}\n");
-                }
-            }
+            //}
+            //else
+            //{
+            //    try
+            //    {
+            //        Debug.Print("[MainViewModel] Envoi de la commande via Arduino");
+            //        await _arduinoController.SendCommandAsync("1");
+            //        await Task.Delay(200);
+            //        await _arduinoController.SendCommandAsync("1");
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        AppendLog($"Erreur Arduino: {ex.Message}\n");
+            //    }
+            //}
 
             AppendLog("Action exécutée avec succès sur l'écran sélectionné !\n");
         }
@@ -222,46 +226,46 @@ namespace DofusHuntHelper.ViewModel
         /// <summary>
         /// Indique si on utilise un simulateur de clavier (true) ou l’Arduino (false).
         /// </summary>
-        public bool UseKeyboardSimulator
-        {
-            get => _useKeyboardSimulator;
-            set
-            {
-                if (_useKeyboardSimulator == value) return;
-                Debug.Print("Changement de la propriété UseKeyboardSimulator -> {0}", value);
-                _useKeyboardSimulator = value;
-                OnPropertyChanged();
+        //public bool UseKeyboardSimulator
+        //{
+        //    get => _useKeyboardSimulator;
+        //    set
+        //    {
+        //        if (_useKeyboardSimulator == value) return;
+        //        Debug.Print("Changement de la propriété UseKeyboardSimulator -> {0}", value);
+        //        _useKeyboardSimulator = value;
+        //        OnPropertyChanged();
 
-                if (_useKeyboardSimulator)
-                {
-                    // Lorsqu'on passe en mode simulateur, on déconnecte l'Arduino
-                    _arduinoController?.Disconnect();
-                    AppendLog("Mode clavier virtuel activé\n");
-                    Debug.Print("Mode clavier virtuel activé. Arduino déconnecté.");
-                }
-                else
-                {
-                    AppendLog("Mode Arduino activé\n");
-                    Debug.Print("Mode Arduino activé.");
-                }
-            }
-        }
+        //        if (_useKeyboardSimulator)
+        //        {
+        //            // Lorsqu'on passe en mode simulateur, on déconnecte l'Arduino
+        //            _arduinoController?.Disconnect();
+        //            AppendLog("Mode clavier virtuel activé\n");
+        //            Debug.Print("Mode clavier virtuel activé. Arduino déconnecté.");
+        //        }
+        //        else
+        //        {
+        //            AppendLog("Mode Arduino activé\n");
+        //            Debug.Print("Mode Arduino activé.");
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Nom du port série de l’Arduino (par ex: "COM3").
         /// </summary>
-        public string Port
-        {
-            get => _port;
-            set
-            {
-                if (_port == value) return;
-                Debug.Print("Changement de la propriété Port -> {0}", value);
-                _port = value;
-                OnPropertyChanged();
-                UpdateArduinoPort();
-            }
-        }
+        //public string Port
+        //{
+        //    get => _port;
+        //    set
+        //    {
+        //        if (_port == value) return;
+        //        Debug.Print("Changement de la propriété Port -> {0}", value);
+        //        _port = value;
+        //        OnPropertyChanged();
+        //        UpdateArduinoPort();
+        //    }
+        //}
 
         /// <summary>
         /// Chaîne affichant les coordonnées capturées (X, Y).
@@ -424,18 +428,18 @@ namespace DofusHuntHelper.ViewModel
             _isRunning = true;
 
             // Connexion à l’Arduino si on est en mode Arduino
-            if (!UseKeyboardSimulator)
-            {
-                Debug.Print("Tentative de connexion à l'Arduino (port : {0}).", _settings.Port);
-                if (!_arduinoController.Connect())
-                {
-                    AppendLog("Échec de la connexion à l'Arduino.\n");
-                    _isRunning = false;
-                    return;
-                }
+            //if (!UseKeyboardSimulator)
+            //{
+            //    Debug.Print("Tentative de connexion à l'Arduino (port : {0}).", _settings.Port);
+            //    if (!_arduinoController.Connect())
+            //    {
+            //        AppendLog("Échec de la connexion à l'Arduino.\n");
+            //        _isRunning = false;
+            //        return;
+            //    }
 
-                Debug.Print("Arduino connecté avec succès sur {0}.", _settings.Port);
-            }
+            //    Debug.Print("Arduino connecté avec succès sur {0}.", _settings.Port);
+            //}
 
             // Configuration du ClipboardWatcher
             _clipboardWatcher = new ClipboardWatcher(_settings.ClipboardCheckIntervalMs);
@@ -458,11 +462,11 @@ namespace DofusHuntHelper.ViewModel
             Debug.Print("Début de StopMonitoring().");
             _isRunning = false;
 
-            if (!UseKeyboardSimulator)
-            {
-                _arduinoController.Disconnect();
-                Debug.Print("Arduino déconnecté.");
-            }
+            //if (!UseKeyboardSimulator)
+            //{
+            //    _arduinoController.Disconnect();
+            //    Debug.Print("Arduino déconnecté.");
+            //}
 
             if (_clipboardWatcher != null)
             {
@@ -561,20 +565,20 @@ namespace DofusHuntHelper.ViewModel
         /// Met à jour le port de l'Arduino, en déconnectant l'ancien contrôleur
         /// puis en créant un nouveau sur le port spécifié.
         /// </summary>
-        private void UpdateArduinoPort()
-        {
-            Debug.Print("Début de UpdateArduinoPort() avec le port {0}", _port);
+        //private void UpdateArduinoPort()
+        //{
+        //    Debug.Print("Début de UpdateArduinoPort() avec le port {0}", _port);
 
-            _arduinoController.Disconnect();
-            Debug.Print("ArduinoController déconnecté avant mise à jour du port.");
+        //    _arduinoController.Disconnect();
+        //    Debug.Print("ArduinoController déconnecté avant mise à jour du port.");
 
-            _settings.Port = _port;
-            SettingsManager.SaveSettings(_settings);
-            Debug.Print("Paramètres sauvegardés après mise à jour du port : {0}", _port);
+        //    _settings.Port = _port;
+        //    SettingsManager.SaveSettings(_settings);
+        //    Debug.Print("Paramètres sauvegardés après mise à jour du port : {0}", _port);
 
-            _arduinoController = new ArduinoController(_settings.Port);
-            Debug.Print("Port Arduino mis à jour sur {0}.", _settings.Port);
-        }
+        //    _arduinoController = new ArduinoController(_settings.Port);
+        //    Debug.Print("Port Arduino mis à jour sur {0}.", _settings.Port);
+        //}
 
         /// <summary>
         /// Ajoute du texte au log de l’interface et l’affiche.

@@ -7,20 +7,26 @@
 
              x:Class="DofusHuntHelper.View.TreasureHuntTab"
              x:DataType="local:MainViewModel">
+
 	<Grid Margin="10">
+		<!-- Définition des lignes et colonnes du Grid -->
 		<Grid.RowDefinitions>
+			<!-- Ligne 0 : Boutons Setup & Start/Stop -->
 			<RowDefinition Height="Auto" />
+			<!-- Ligne 1 : Sélection de l'écran -->
 			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
+			<!-- Ligne 2 : Zone de texte pour logs -->
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
+
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="*" />
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 
 		<!-- Ligne 0 : Boutons Setup & Start/Stop -->
-		<StackPanel Grid.Row="0" Grid.ColumnSpan="2"
+		<StackPanel Grid.Row="0"
+                    Grid.ColumnSpan="2"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     Spacing="10">
@@ -32,37 +38,25 @@
                     Command="{Binding StartStopCommand}" />
 		</StackPanel>
 
-		<!-- Ligne 1 : Checkbox + Label coordonnées -->
-		<StackPanel Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0"
-                    Orientation="Vertical"
+		<!-- Ligne 1 : Sélection de l'écran (Screen) -->
+		<StackPanel Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
                     HorizontalAlignment="Center"
-                    Spacing="10" Margin="0,10,0,0">
-			<CheckBox Content="Keyboard Mode"
-                      IsChecked="{Binding UseKeyboardSimulator}" />
-			<Label Content="{Binding CoordinatesDisplay}" />
-		</StackPanel>
-
-		<!-- Ligne 2 : Serial Port / Screen -->
-		<StackPanel Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center">
-			<TextBlock Text="Serial Port" Margin="240,0,0,5" />
-			<TextBox Text="{Binding Port}"
-                     Width="150"
-                     TextAlignment="Center"
-                     Margin="200 0 0 0" />
-		</StackPanel>
-
-		<StackPanel Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center">
-			<TextBlock Text="Screen" Margin="-150,0,0,5" />
+                    Spacing="10">
+			<TextBlock Text="Screen"
+                       VerticalAlignment="Center" />
 			<ComboBox ItemsSource="{Binding ScreenNames}"
                       SelectedIndex="{Binding SelectedScreenIndex}"
-                      Width="150"
-                      Margin="-250 0 0 0" />
+                      Width="150" />
 		</StackPanel>
 
-		<!-- Ligne 3 : TextBox de log -->
-		<TextBox Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0"
+		<!-- Ligne 2 : TextBox de log -->
+		<TextBox Grid.Row="2"
+                 Grid.ColumnSpan="2"
                  Margin="5"
                  Text="{Binding OutputLog}"
-                 AcceptsReturn="True" />
+                 AcceptsReturn="True"
+                 IsReadOnly="True"/>
 	</Grid>
 </UserControl>
