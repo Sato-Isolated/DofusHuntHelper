@@ -12,18 +12,15 @@ Bien que DofusDB soit un exemple courant, l'application fonctionne avec tout sit
 ---
 
 ## Fonctionnalités
-- Connexion à un Arduino via le port série (optionnel)
 - Capture des coordonnées de clic souris
 - Automatisation de la saisie des commandes `/travel`
 - Gestion multi-écrans
-- Fonctionnement sans Arduino en utilisant uniquement des interactions clavier/souris
 
 ---
 
 ## Prérequis
 - Visual Studio
-- .NET 8
-- [Arduino](https://www.arduino.cc/) compatible (exemple utilisé : Arduino Uno R4 WiFi) si vous souhaitez utiliser la version avec Arduino
+- .NET 9
 
 ---
 
@@ -38,11 +35,9 @@ Bien que DofusDB soit un exemple courant, l'application fonctionne avec tout sit
 ---
 
 ## Utilisation
-1. **Avec Arduino** : Connectez l'Arduino et cliquez sur "Start".
-2. **Sans Arduino** : Lancez simplement l'application et utilisez les fonctionnalités avec le clavier et la souris.
-3. Capturez les coordonnées avec "Capture".
-4. Copiez une commande `/travel` dans le presse-papier depuis un site ou outil de chasse au trésor.
-5. L'application déplacera automatiquement la souris vers le chat de Dofus, collera la commande, et effectuera deux pressions sur Entrée pour valider la commande.
+1. Capturez les coordonnées avec "Capture".
+2. Copiez une commande `/travel` dans le presse-papier depuis un site ou outil de chasse au trésor.
+3. L'application déplacera automatiquement la souris vers le chat de Dofus, collera la commande, et effectuera deux pressions sur Entrée pour valider la commande.
 
 ---
 
@@ -80,18 +75,15 @@ Although DofusDB is a common example, the application works with any site or too
 ---
 
 ## Features
-- Arduino connection via serial port (optional)
 - Mouse click coordinate capture
 - Automation of `/travel` command input
 - Multi-screen support
-- Works without Arduino using keyboard/mouse interactions only
 
 ---
 
 ## Prerequisites
 - Visual Studio
-- .NET 8
-- Compatible [Arduino](https://www.arduino.cc/) (example used: Arduino Uno R4 WiFi) if using the Arduino version
+- .NET 9
 
 ---
 
@@ -106,11 +98,9 @@ Although DofusDB is a common example, the application works with any site or too
 ---
 
 ## Usage
-1. **With Arduino**: Connect the Arduino and click "Start".
-2. **Without Arduino**: Simply launch the application and use the features with the keyboard and mouse.
-3. Capture the coordinates with "Capture".
-4. Copy a `/travel` command to the clipboard from any treasure hunt site or tool.
-5. The application will automatically move the mouse to the Dofus chat, paste the command, and press Enter twice to execute it.
+1. Capture the coordinates with "Capture".
+2. Copy a `/travel` command to the clipboard from any treasure hunt site or tool.
+3. The application will automatically move the mouse to the Dofus chat, paste the command, and press Enter twice to execute it.
 
 ---
 
