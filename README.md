@@ -1,3 +1,6 @@
+Ce projet est en pause pour le moment, car je ne prends aucun plaisir à jouer au jeu dans son état actuel. Il n’y aura donc pas de mise à jour prévue.
+
+
 # Dofus Hunt Helper
 ![image](https://github.com/user-attachments/assets/312981d0-8f9c-4891-974a-ccba5ae4abc3)
 
