@@ -157,10 +157,18 @@ namespace DofusHuntHelper.ViewModel
 
             // Met la fenêtre du jeu au premier plan et simule un clic
             NativeMethods.SetForegroundWindow(handle);
+            Task.Delay(100).Wait(); // Attente pour s'assurer que la fenêtre est au premier plan
             NativeMethods.mouse_event(
                 NativeMethods.MouseeventfLeftdown | NativeMethods.MouseeventfLeftup,
                 0, 0, 0, 0);
-
+            Task.Delay(100).Wait(); // Attente pour s'assurer que le clic est enregistré
+            NativeMethods.mouse_event(
+                NativeMethods.MouseeventfLeftdown | NativeMethods.MouseeventfLeftup,
+                0, 0, 0, 0);
+            Task.Delay(100).Wait(); // Attente pour s'assurer que le clic est enregistré
+            NativeMethods.mouse_event(
+                NativeMethods.MouseeventfLeftdown | NativeMethods.MouseeventfLeftup,
+                0, 0, 0, 0);
             NativeMethods.SetForegroundWindow(handle);
 
             // Envoie la commande "/travel" soit via le simulateur, soit via l'Arduino
@@ -173,6 +181,8 @@ namespace DofusHuntHelper.ViewModel
                         KeyboardSimulator.VirtualKey.VkControl,
                         KeyboardSimulator.VirtualKey.VkV);
                     await Task.Delay(50);
+                    KeyboardSimulator.SendRealisticEnter();
+                    await Task.Delay(200);
                     KeyboardSimulator.SendRealisticEnter();
                     await Task.Delay(200);
                     KeyboardSimulator.SendRealisticEnter();
